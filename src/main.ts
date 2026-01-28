@@ -1,6 +1,6 @@
 import {ClassicPreset} from 'rete';
 import {createVisualEditor, arrangeNodes} from './editor/setup.ts';
-
+import './core/subscribers.ts'
 import {StartNode} from './core/nodes/flow/StartNode.ts';
 
 const nodeFactories: Record<string, () => ClassicPreset.Node> = {

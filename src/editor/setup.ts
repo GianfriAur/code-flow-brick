@@ -27,7 +27,7 @@ export async function createVisualEditor(container: HTMLElement): Promise<{
     // Use default presets
     render.addPreset(ReactPresets.classic.setup());
 
-    connection.addPreset(() => setupFlowConnectorRepository());
+    connection.addPreset(() => setupFlowConnectorRepository<Schemes>(editor));
     console.log(ConnectionPresets.classic.setup());
 
     // Register plugins
