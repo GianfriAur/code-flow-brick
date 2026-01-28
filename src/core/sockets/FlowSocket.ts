@@ -20,13 +20,13 @@ window.addEventListener('code-flow-brick.flow-connector-repository.init', (event
     repository.addConnectionValidator((from: BaseSocketData, to: BaseSocketData, editor: NodeEditor<any>) => {
         if (from.payload.name === 'core.flow' || to.payload.name === 'core.flow') {
             if (from.nodeId === to.nodeId) {
-                console.log("Cannot connect node to itself");
+                editor.notificator.error("Cannot connect node to itself")
                 return false;
             }
         }
 
         if (from.payload.name !== to.payload.name) {
-            console.log("Socket types don't match");
+            editor.notificator.error("Socket types don't match")
             return false;
         }
 
@@ -36,7 +36,8 @@ window.addEventListener('code-flow-brick.flow-connector-repository.init', (event
 
 
         if (hasLoop(target, source, editor)) {
-            console.log("Connection would create a cycle");
+            editor.notificator.error("Connection would create a cycle")
+
             return false;
         }
 

@@ -3,16 +3,18 @@ import type {GetSchemes} from 'rete';
 import {AreaPlugin, AreaExtensions} from 'rete-area-plugin';
 import {ConnectionPlugin, Presets as ConnectionPresets} from 'rete-connection-plugin';
 import {ReactPlugin, Presets as ReactPresets} from 'rete-react-plugin';
-import type {ReactArea2D} from 'rete-react-plugin';
+
 import {createRoot} from 'react-dom/client';
 import {setup as setupFlowConnectorRepository} from "../core/FlowConnectorRepository.ts";
+import {NotificationPlugin} from "../core/plugins/notification.ts";
+import type {AreaExtra} from "../types";
 
 // Use ClassicPreset types for compatibility with rendering plugins
 class Connection<A extends ClassicPreset.Node, B extends ClassicPreset.Node> extends ClassicPreset.Connection<A, B> {
 }
 
 type Schemes = GetSchemes<ClassicPreset.Node, Connection<ClassicPreset.Node, ClassicPreset.Node>>;
-type AreaExtra = ReactArea2D<Schemes>;
+
 
 export async function createVisualEditor(container: HTMLElement): Promise<{
     editor: NodeEditor<Schemes>;
@@ -21,19 +23,28 @@ export async function createVisualEditor(container: HTMLElement): Promise<{
     const editor = new NodeEditor<Schemes>();
 
     const area = new AreaPlugin<Schemes, AreaExtra>(container);
+    const notification = new NotificationPlugin<Schemes>();
+
     const connection = new ConnectionPlugin<Schemes, AreaExtra>();
     const render = new ReactPlugin<Schemes, AreaExtra>({createRoot});
 
     // Use default presets
     render.addPreset(ReactPresets.classic.setup());
 
-    connection.addPreset(() => setupFlowConnectorRepository<Schemes>(editor));
+    connection.addPreset(() => setupFlowConnectorRepository<Schemes>(editor, connection));
     console.log(ConnectionPresets.classic.setup());
 
     // Register plugins
     editor.use(area);
     area.use(connection);
+    editor.notificator = notification
+    // @ts-ignore
+    area.use(notification);
     area.use(render);
+
+    setTimeout(() => {
+        notification.error("Cannot create cycle!");
+    }, 1000)
 
     // Enable zoom, pan and selection
     AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {

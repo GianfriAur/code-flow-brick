@@ -1,9 +1,10 @@
 import type {ClassicScheme} from "rete-react-plugin";
-import {ClassicFlow, type SocketData} from "rete-connection-plugin";
+import {ClassicFlow, type ConnectionPlugin, type SocketData} from "rete-connection-plugin";
 import {ClassicPreset, NodeEditor} from "rete";
 import type {BaseNode} from "./nodes/CompilableNode.ts";
 import type {Context} from "rete-connection-plugin/_types/flow/base";
 import type {BaseSocketData} from "./sockets/BaseSocket.ts";
+import type {AreaExtra} from "../types";
 
 type NodeProps = | BaseNode
 
@@ -28,8 +29,9 @@ export class FlowConnectorRepository<Schemes extends ClassicScheme, K extends an
     validators: PrioritizeValidator<Schemes>[];
     connectors: PrioritizeConnector<Schemes>[];
     editor: NodeEditor<Schemes>;
+    connection: ConnectionPlugin<Schemes, AreaExtra>;
 
-    constructor(editor: NodeEditor<Schemes>) {
+    constructor(editor: NodeEditor<Schemes>, connection: ConnectionPlugin<Schemes, AreaExtra>) {
         super({
             canMakeConnection: (from: SocketData, to: SocketData) => this.canMakeConnection(from as BaseSocketData, to as BaseSocketData, this.editor),
             makeConnection: (from: SocketData, to: SocketData, context: Context<Schemes, any>) => this.makeConnection(from as BaseSocketData, to as BaseSocketData, context)
@@ -37,18 +39,33 @@ export class FlowConnectorRepository<Schemes extends ClassicScheme, K extends an
         this.validators = [];
         this.connectors = [];
         this.editor = editor;
+        this.connection = connection;
     }
 
     canMakeConnection(from: BaseSocketData, to: BaseSocketData, editor: NodeEditor<Schemes>): boolean | undefined {
-        console.log(from, to, 'canMakeConnection');
+        const pickedSocket = this.getPickedSocket();
+        const isDrop = pickedSocket !== undefined;
+
+        if (from.element === to.element) {
+            return;
+        }
+
+        console.log(from, to, 'canMakeConnection', isDrop);
+
         for (const validator of this.validators) {
             const result = validator.method(from, to, editor);
             if (result !== undefined) {
+
+                if (!result && isDrop) {
+                    this.connection.drop();
+                }
+
                 return result;
             }
         }
         return true;
     }
+
 
     makeConnection(from: BaseSocketData, to: BaseSocketData, context: Context<Schemes, any>): true | undefined {
         console.log(from, to, context, 'makeConnection');
@@ -77,9 +94,9 @@ export type FlowConnectorRepoInitEvent = CustomEvent<{
     repository: FlowConnectorRepository<ClassicScheme, any[]>
 }>;
 
-export function setup<Schemes extends ClassicScheme>(editor: NodeEditor<Schemes>) {
+export function setup<Schemes extends ClassicScheme>(editor: NodeEditor<Schemes>, connection: ConnectionPlugin<Schemes, AreaExtra>) {
 
-    const repo = new FlowConnectorRepository<ClassicScheme, any[]>(editor);
+    const repo = new FlowConnectorRepository<ClassicScheme, any[]>(editor, connection);
 
     window.dispatchEvent(new CustomEvent('code-flow-brick.flow-connector-repository.init', {detail: {repository: repo}}) as FlowConnectorRepoInitEvent)
 

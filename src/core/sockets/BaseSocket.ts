@@ -24,7 +24,7 @@ window.addEventListener('code-flow-brick.flow-connector-repository.init', (event
     repository.addConnectionValidator((from: BaseSocketData, to: BaseSocketData, editor: NodeEditor<any>) => {
 
         if (from.payload.name !== to.payload.name) {
-            console.log("Socket types don't match");
+            editor.notificator.error("Socket types don't match")
             return false;
         }
 
@@ -38,7 +38,7 @@ window.addEventListener('code-flow-brick.flow-connector-repository.init', (event
         });
 
         if (inputAlreadyConnected) {
-            console.log("Input already connected");
+            editor.notificator.error("Input already connected")
             return false;
         }
 
