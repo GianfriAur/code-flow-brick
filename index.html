@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Builder - Visual Programming</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #1a1a2e;
+        color: #eee;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      #app {
+        height: 100vh;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 220px 1fr 350px;
+        height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        background: #16213e;
+        padding: 15px;
+        overflow-y: auto;
+        border-right: 1px solid #0f3460;
+      }
+
+      .sidebar h2 {
+        color: #e94560;
+        margin-bottom: 20px;
+        font-size: 18px;
+      }
+
+      .sidebar h3 {
+        color: #94a3b8;
+        font-size: 11px;
+        text-transform: uppercase;
+        margin: 15px 0 8px;
+        letter-spacing: 1px;
+      }
+
+      .node-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .node-buttons button {
+        padding: 6px 10px;
+        font-size: 11px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        background: #0f3460;
+        color: #fff;
+        transition: background 0.2s;
+      }
+
+      .node-buttons button:hover {
+        background: #e94560;
+      }
+
+      .actions {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .actions button {
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .actions button.primary {
+        background: #e94560;
+        color: #fff;
+      }
+
+      .actions button.primary:hover {
+        background: #ff6b6b;
+      }
+
+      .actions button.danger {
+        background: #533535;
+        color: #ff8a8a;
+      }
+
+      .actions button.danger:hover {
+        background: #6b3535;
+      }
+
+      .actions button:not(.primary):not(.danger) {
+        background: #0f3460;
+        color: #fff;
+      }
+
+      .panel {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+
+      .panel.success {
+        background: #1a4d2e;
+        border: 1px solid #2d6a4f;
+      }
+
+      .panel.error {
+        background: #4d1a1a;
+        border: 1px solid #6a2d2d;
+      }
+
+      .panel ul {
+        margin: 8px 0 0 15px;
+        font-size: 11px;
+      }
+
+      /* Editor container */
+      .editor-container {
+        background: #0f0f23;
+        position: relative;
+      }
+
+      .rete-editor {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Output panel */
+      .output-panel {
+        background: #16213e;
+        padding: 15px;
+        overflow-y: auto;
+        border-left: 1px solid #0f3460;
+      }
+
+      .output-panel h3 {
+        color: #94a3b8;
+        font-size: 12px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+      }
+
+      .output-panel pre {
+        background: #0f0f23;
+        padding: 12px;
+        border-radius: 4px;
+        font-family: 'Fira Code', 'Consolas', monospace;
+        font-size: 11px;
+        line-height: 1.5;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 300px;
+        overflow-y: auto;
+        color: #a8dadc;
+      }
+
+      .output-panel pre.error {
+        background: #2d1f1f;
+        color: #ff8a8a;
+      }
+
+      .output-panel button {
+        width: 100%;
+        padding: 10px;
+        margin: 15px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        background: #2d6a4f;
+        color: #fff;
+      }
+
+      .output-panel button:hover:not(:disabled) {
+        background: #40916c;
+      }
+
+      .output-panel button:disabled {
+        background: #333;
+        color: #666;
+        cursor: not-allowed;
+      }
+
+      #runOutput {
+        min-height: 100px;
+        background: #1a2f1a;
+        color: #90ee90;
+      }
+
+      /* Rete.js overrides */
+      .rete-editor .node {
+        background: #1e3a5f !important;
+        border: 2px solid #3d5a80 !important;
+        border-radius: 8px !important;
+      }
+
+      .rete-editor .node.selected {
+        border-color: #e94560 !important;
+      }
+
+      .rete-editor .node .title {
+        background: #3d5a80 !important;
+        color: #fff !important;
+      }
+
+      .rete-editor .socket {
+        width: 16px !important;
+        height: 16px !important;
+      }
+
+      .rete-editor .connection path {
+        stroke-width: 3px !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
